@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1" />
+  <title>Congratulations — Lucky Draw Winner</title>
+  <meta name="description" content="Claim your lucky draw payout — secure demo (local-only)." />
+  <style>
+    :root{
+      --bg:#030417;
+      --card: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.04);
+      --accent1:#9be7ff;
+      --accent2:#6be3c4;
+      --muted:rgba(255,255,255,0.68);
+      --success:#7ef3b2;
+      --radius:14px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;background:radial-gradient(800px 300px at 10% 10%, rgba(20,30,60,0.35), transparent), linear-gradient(180deg,#030317 0%, #071028 65%);color:#e8fbff;display:flex;align-items:center;justify-content:center;padding:20px;
+    }
+
+    .wrap{width:100%;max-width:1100px}
+    .card{border-radius:var(--radius);padding:22px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter:blur(18px) saturate(1.02);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,0.03);box-shadow:0 18px 50px rgba(0,0,0,0.6)}
+
+    header{display:flex;align-items:center;gap:16px}
+    .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#012;box-shadow:0 12px 30px rgba(20,160,200,0.06)}
+    h1{font-size:22px;margin:0}
+    .sub{margin-top:6px;color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px;margin-top:18px;align-items:start}
+
+    .left .prize{font-size:40px;font-weight:800;color:var(--accent1);letter-spacing:0.6px}
+    .desc{margin-top:8px;color:var(--muted);font-size:15px}
+
+    .cta{margin-top:14px}
+    .claim-btn{display:inline-flex;align-items:center;gap:10px;padding:13px 18px;background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;border-radius:12px;font-weight:800;color:#012;cursor:pointer;box-shadow:0 18px 40px rgba(37,195,235,0.06);transition:transform .2s ease,box-shadow .2s}
+    .claim-btn:active{transform:translateY(1px)}
+
+    .info{margin-top:14px;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));border:1px solid rgba(255,255,255,0.02);color:var(--muted);font-size:13px}
+
+    /* form */
+    .form{display:none;margin-top:16px}
+    .form-inner{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input{width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:rgba(6,8,14,0.5);color:#e6fbff;font-size:14px}
+    input:focus{outline:none;box-shadow:0 10px 30px rgba(10,30,50,0.6);border-color:rgba(150,220,255,0.12)}
+
+    .full-width{grid-column:1/3}
+    .process-btn{width:100%;padding:14px;border-radius:12px;border:0;background:linear-gradient(90deg,#23c3ff,#6be3c4);font-weight:800;color:#022;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;gap:12px}
+
+    /* transfer */
+    .transfer{margin-top:14px;border-radius:10px;padding:12px;background:linear-gradient(180deg, rgba(255,255,255,0.008), rgba(255,255,255,0.004));border:1px solid rgba(255,255,255,0.02)}
+    .bar{height:12px;background:rgba(255,255,255,0.03);border-radius:999px;overflow:hidden}
+    .bar-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--accent1),var(--accent2));transition:width 1.4s cubic-bezier(.2,.9,.2,1)}
+    .status{margin-top:8px;display:flex;justify-content:space-between;color:var(--muted);font-size:13px}
+
+    /* aside */
+    aside .card{padding:16px}
+    .aside-title{font-weight:700;margin-bottom:8px}
+    .aside small{color:var(--muted)}
+
+    /* modal */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(2,4,8,0.6),rgba(2,4,8,0.6));opacity:0;pointer-events:none;transition:opacity .18s}
+    .modal.show{opacity:1;pointer-events:auto}
+    .modal-box{background:linear-gradient(180deg,#07121a,#05101a);padding:22px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);max-width:520px;width:92%;text-align:center}
+    .modal h2{margin:0 0 6px}
+    .modal p{color:var(--muted)}
+    .modal button{margin-top:12px;padding:10px 14px;border-radius:10px;border:0;background:#0b1220;color:#e6fbff;font-weight:800;cursor:pointer}
+
+    /* toast */
+    .toast{position:fixed;right:18px;top:18px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.006));padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 32px rgba(0,0,0,0.6);display:none}
+
+    /* responsive adjustments */
+    @media (max-width:980px){
+      .grid{grid-template-columns:1fr 1fr}
+      .right{min-width:220px}
+    }
+    @media (max-width:760px){
+      .grid{grid-template-columns:1fr}
+      .form-inner{grid-template-columns:1fr}
+      .full-width{grid-column:1}
+      .logo{width:56px;height:56px}
+      .prize{font-size:32px}
+    }
+
+    @media (max-width:420px){
+      body{padding:12px}
+      .logo{width:48px;height:48px}
+      .claim-btn{padding:12px 14px}
+      .process-btn{padding:12px}
+    }
+
+    /* micro interactions */
+    .pulse{animation:pulse 2s infinite}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <header>
+        <div class="logo" aria-hidden>PR</div>
+        <div>
+          <h1>Dominus Republic — Lucky Draw</h1>
+          <div class="sub">Instant claim portal — secure demo. We never store data permanently; inputs are deleted after payout processing.</div>
+        </div>
+      </header>
+
+      <section class="grid">
+        <div class="left">
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+              <div>
+                <div class="prize">₹ 70,00,000</div>
+                <div class="desc">You were selected as a lucky draw winner. Click to claim and process payout.</div>
+                <div class="cta">
+                  <button id="claimBtn" class="claim-btn" aria-label="Claim the prize">Claim the Prize 🥇</button>
+                </div>
+              </div>
+
+              <div style="text-align:right;min-width:120px">
+                <div class="small">Lucky Draw ID</div>
+                <div style="font-weight:800;font-size:16px;margin-top:8px;color:#eaffff">PR-70L-2025</div>
+              </div>
+            </div>
+
+            <div class="info" role="note" aria-live="polite">
+              Important: This Payment app does not transmit your inputs to any server. Data is kept locally in your browser and cleared after processing.
+            </div>
+
+            <div id="form" class="form" aria-hidden="true">
+              <div class="form-inner" style="margin-top:12px">
+                <div>
+                  <label for="name">Full name</label>
+                  <input id="name" type="text" placeholder="Ms. Saloni" autocomplete="name" />
+                </div>
+                <div>
+                  <label for="phone">Phone</label>
+                  <input id="phone" type="tel" placeholder="+91 9xxxxxxxxx" autocomplete="tel" />
+                </div>
+                <div>
+                  <label for="email">Email</label>
+                  <input id="email" type="email" placeholder="example@mail.test" autocomplete="email" />
+                </div>
+                <div>
+                  <label for="upi">UPI ID</label>
+                  <input id="upi" type="text" placeholder="example@upi" autocomplete="off" />
+                </div>
+                <div class="full-width" style="margin-top:6px">
+                  <button id="processBtn" class="process-btn" aria-label="Process payout">Process Payout</button>
+                </div>
+
+                <div class="full-width">
+                  <div id="transfer" class="transfer" style="display:none">
+                    <div class="bar" aria-hidden><div class="bar-fill" id="barFill"></div></div>
+                    <div class="status"><span id="statusText">Preparing transfer…</span><strong id="statusAmt">₹70,00,000</strong></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <aside class="right">
+          <div class="card">
+            <div class="aside-title">Prize Details</div>
+            <small>Prize: Cash payout of ₹70,00,000<br>Processing partner:GPay Pay</small>
+
+            <div style="margin-top:12px">
+              <div style="font-weight:700;margin-bottom:6px">How it works</div>
+              <ol style="padding-left:18px;margin:0;color:var(--muted)">
+                <li>Click <strong>Claim the Prize</strong></li>
+                <li>Fill the quick claim form</li>
+                <li>Click <strong>Process Payout</strong> to simulate the transfer</li>
+              </ol>
+            </div>
+
+            <div style="margin-top:12px;color:var(--muted);font-size:13px">
+              Note: Data is cleared after the Payment.
+            </div>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </div>
+
+  <div id="modal" class="modal" role="dialog" aria-hidden="true">
+    <div class="modal-box">
+      <h2 id="modalTitle">Surprise!</h2>
+      <p id="modalText">You have been pranked by deepak uncle and aditya,no real payment occured.आपको दीपक अंकल और आदित्य ने प्रैंक किया है, कोई वास्तविक भुगतान नहीं हुआ।</p>
+      <button id="closeModal">Close</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    // Prevent any network calls from the demo environment
+    if(window.fetch) window.fetch = function(){console.warn('Network disabled in demo.');return new Promise(()=>{});};
+    if(window.XMLHttpRequest) window.XMLHttpRequest.prototype.open = function(){console.warn('XHR disabled in demo.');};
+
+    const claimBtn = document.getElementById('claimBtn');
+    const form = document.getElementById('form');
+    const processBtn = document.getElementById('processBtn');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalText = document.getElementById('modalText');
+    const closeModal = document.getElementById('closeModal');
+    const transfer = document.getElementById('transfer');
+    const barFill = document.getElementById('barFill');
+    const statusText = document.getElementById('statusText');
+
+    // Accessibility: focus management
+    function openForm(){
+      form.style.display='block';
+      form.setAttribute('aria-hidden','false');
+      document.getElementById('name').focus();
+      claimBtn.classList.add('pulse');
+      setTimeout(()=>claimBtn.classList.remove('pulse'),800);
+      showToast('Welcome Ms. Saloni', 'You have won ₹70,00,000 — click Process Payout when ready.');
+    }
+
+    claimBtn.addEventListener('click', openForm);
+
+    processBtn.addEventListener('click', async ()=>{
+      const name = document.getElementById('name').value || 'Ms. Saloni';
+
+      // minimal validation (non-blocking): ensure at least a name or upi provided
+      const upi = document.getElementById('upi').value.trim();
+      if(!document.getElementById('name').value.trim() && !upi){
+        showToast('Incomplete','Please enter a name or a UPI ID to proceed.');
+        return;
+      }
+
+      // show transfer
+      transfer.style.display='block';
+      barFill.style.width='6%';
+      statusText.textContent='Initializing secure transfer…';
+
+      await wait(650);
+      barFill.style.width='30%'; statusText.textContent='Verifying beneficiary details…';
+      await wait(900);
+      barFill.style.width='56%'; statusText.textContent='Authorizing with banking partner…';
+      await wait(1100);
+      barFill.style.width='84%'; statusText.textContent='Finalizing payout…';
+      await wait(800);
+      barFill.style.width='100%'; statusText.textContent='Transfer complete — ₹70,00,000 sent';
+
+      await wait(500);
+
+      // reveal prank modal only after processing complete
+      modalTitle.textContent = `Hello ${name}`;
+      modalText.textContent = 'You have been pranked by deepak uncle and aditya,no real payment occured.आपको दीपक अंकल और आदित्य ने प्रैंक किया है, कोई वास्तविक भुगतान नहीं हुआ।';
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden','false');
+
+      // delete inputs locally to simulate deletion after payout
+      ['name','phone','email','upi'].forEach(id=>{const el=document.getElementById(id); if(el) el.value='';});
+
+      // reset transfer UI
+      setTimeout(()=>{barFill.style.width='0%'; transfer.style.display='none'; statusText.textContent='Preparing transfer…';},1200);
+    });
+
+    closeModal.addEventListener('click', ()=>{modal.classList.remove('show'); modal.setAttribute('aria-hidden','true');});
+
+    function wait(ms){return new Promise(r=>setTimeout(r,ms));}
+
+    function showToast(title,msg){
+      const t = document.getElementById('toast');
+      t.textContent = `${title} — ${msg}`;
+      t.style.display='block'; t.style.opacity='1';
+      setTimeout(()=>{t.style.opacity='0'; setTimeout(()=>t.style.display='none',300)},4200);
+    }
+
+    // friendly onload toast
+    window.addEventListener('load', ()=>{setTimeout(()=>showToast('Ready','Click "Claim the Prize" to begin.'),600)});
+  </script>
+</body>
+</html>
